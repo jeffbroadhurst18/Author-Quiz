@@ -4,6 +4,7 @@ import './index.css';
 import AuthorQuiz from './AuthorQuiz';
 import registerServiceWorker from './registerServiceWorker';
 import {shuffle, sample} from 'underscore';
+import { statSync } from 'fs';
 
 const authors = [
   {
@@ -49,6 +50,7 @@ const authors = [
 const getTurnData=(authors) => {
   const allBooks = authors.reduce((p,c,i) => {return p.concat(c.books);}, []);
   const fourRandomBooks = shuffle(allBooks).slice(0,4);
+  // picks one of the four books
   const answer = sample(fourRandomBooks);
 
   return {
@@ -59,7 +61,17 @@ const getTurnData=(authors) => {
 
 const state = {
   turnData: getTurnData(authors),
+  highlight: 'none',
 };
 
-ReactDOM.render(<AuthorQuiz {...state} />, document.getElementById('root'));
+const onAnswerSelected=(answer) => {
+  const isCorrect = state.turnData.author.books.some(book => book === answer);
+  state.highlight = isCorrect ? 'correct' : 'wrong'; 
+  render(); 
+};
+
+const render=() => {
+  ReactDOM.render(<AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} />, document.getElementById('root'));
+};
+render();
 registerServiceWorker();
