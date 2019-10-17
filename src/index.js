@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import AuthorQuiz from './AuthorQuiz';
+import AddAuthorForm from './AddAuthorForm';
 import registerServiceWorker from './registerServiceWorker';
 import {shuffle, sample} from 'underscore';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { statSync } from 'fs';
 
 const authors = [
@@ -70,8 +72,30 @@ const onAnswerSelected=(answer) => {
   render(); 
 };
 
+
+
+const App=()=> {
+  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} />;
+};
+
+const onAddAuthor=(a)=>{
+  console.log(a);
+}
+
+const AuthorWrapper=()=> {
+  return <AddAuthorForm onAddAuthor={onAddAuthor} />;
+};
+
+
+
 const render=() => {
-  ReactDOM.render(<AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} />, document.getElementById('root'));
+  ReactDOM.render(
+    <BrowserRouter>
+      <>
+        <Route exact path="/" component={App} />
+        <Route path="/add" component={AuthorWrapper} />
+      </>
+    </BrowserRouter>, document.getElementById('root'));
 };
 render();
 registerServiceWorker();

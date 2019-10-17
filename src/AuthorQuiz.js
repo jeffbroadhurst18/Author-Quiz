@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-key */
 /* eslint-disable react/jsx-no-comment-textnodes */
-import React, { Component } from 'react';
+import React from 'react';
 import {PropTypes} from 'prop-types';
 import './App.css';
 import './bootstrap.min.css';
+import {Link} from 'react-router-dom';
 
 const Hero = () => {
   return (<div className="row">
@@ -74,10 +75,11 @@ const AuthorQuiz=({turnData, highlight, onAnswerSelected}) =>
       <Hero />
       <Turn {...turnData} highlight={highlight} onAnswerSelected={onAnswerSelected}/>
       <Continue />
+      <p><Link to="/add">Add an author</Link></p>
       <Footer />
     </div>
   );
-}
+};
 
 
 export default AuthorQuiz;
