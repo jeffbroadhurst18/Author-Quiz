@@ -4,8 +4,8 @@ import './index.css';
 import AuthorQuiz from './AuthorQuiz';
 import AddAuthorForm from './AddAuthorForm';
 import registerServiceWorker from './registerServiceWorker';
-import {shuffle, sample} from 'underscore';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { shuffle, sample } from 'underscore';
+import { BrowserRouter, Route, withRouter } from 'react-router-dom';
 import { statSync } from 'fs';
 
 const authors = [
@@ -49,9 +49,9 @@ const authors = [
   },
 ];
 
-const getTurnData=(authors) => {
-  const allBooks = authors.reduce((p,c,i) => {return p.concat(c.books);}, []);
-  const fourRandomBooks = shuffle(allBooks).slice(0,4);
+const getTurnData = (authors) => {
+  const allBooks = authors.reduce((p, c, i) => { return p.concat(c.books); }, []);
+  const fourRandomBooks = shuffle(allBooks).slice(0, 4);
   // picks one of the four books
   const answer = sample(fourRandomBooks);
 
@@ -61,34 +61,43 @@ const getTurnData=(authors) => {
   };
 };
 
-const state = {
-  turnData: getTurnData(authors),
-  highlight: 'none',
+const resetState = () => {
+  return {
+    turnData: getTurnData(authors),
+    highlight: 'none',
+  };
 };
 
-const onAnswerSelected=(answer) => {
+let state = resetState();
+
+const onAnswerSelected = (answer) => {
   const isCorrect = state.turnData.author.books.some(book => book === answer);
-  state.highlight = isCorrect ? 'correct' : 'wrong'; 
-  render(); 
+  state.highlight = isCorrect ? 'correct' : 'wrong';
+  render();
 };
 
-
-
-const App=()=> {
-  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} />;
-};
-
-const onAddAuthor=(a)=>{
-  console.log(a);
+const onContinue = () => {
+  state = resetState();
+  render();
 }
 
-const AuthorWrapper=()=> {
-  return <AddAuthorForm onAddAuthor={onAddAuthor} />;
+const App = () => {
+  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} onContinue={onContinue} />;
 };
 
+// const onAddAuthor=(a, history)=>{
+//   authors.push(a);
+//   history.push('/');
+// };
+// this is now a variable returing output of withRouter function
+const AuthorWrapper = withRouter(({ history }) =>
+  <AddAuthorForm onAddAuthor={(author) => {
+    authors.push(author);
+    history.push('/');
+  }} />);
 
 
-const render=() => {
+const render = () => {
   ReactDOM.render(
     <BrowserRouter>
       <>
