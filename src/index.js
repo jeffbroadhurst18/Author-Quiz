@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import * as Redux from 'redux';
+import * as ReactRedux from 'react-redux';
 import './index.css';
 import AuthorQuiz from './AuthorQuiz';
 import AddAuthorForm from './AddAuthorForm';
@@ -61,34 +63,26 @@ const getTurnData = (authors) => {
   };
 };
 
-const resetState = () => {
-  return {
-    turnData: getTurnData(authors),
-    highlight: 'none',
-  };
+const reducer = (state = {authors, turnData: getTurnData(authors), highlight: ''},action) => {
+  switch (action.type) {
+    case 'ANSWER_SELECTED':
+      // eslint-disable-next-line no-case-declarations
+      const isCorrect = state.turnData.author.books.some(book => book === action.answer);
+      return Object.assign({}, state, {highlight: isCorrect ? 'correct' : 'wrong'});
+    case 'CONTINUE':
+      return Object.assign({}, state, {highlight: '', turnData : getTurnData(state.authors)});
+    default: return state;
+  }
 };
 
-let state = resetState();
-
-const onAnswerSelected = (answer) => {
-  const isCorrect = state.turnData.author.books.some(book => book === answer);
-  state.highlight = isCorrect ? 'correct' : 'wrong';
-  render();
-};
-
-const onContinue = () => {
-  state = resetState();
-  render();
-}
+const store = Redux.createStore(reducer);
 
 const App = () => {
-  return <AuthorQuiz {...state} onAnswerSelected={onAnswerSelected} onContinue={onContinue} />;
+  return <ReactRedux.Provider store={store}>
+    <AuthorQuiz />
+  </ReactRedux.Provider>;
 };
 
-// const onAddAuthor=(a, history)=>{
-//   authors.push(a);
-//   history.push('/');
-// };
 // this is now a variable returing output of withRouter function
 const AuthorWrapper = withRouter(({ history }) =>
   <AddAuthorForm onAddAuthor={(author) => {
@@ -97,14 +91,14 @@ const AuthorWrapper = withRouter(({ history }) =>
   }} />);
 
 
-const render = () => {
-  ReactDOM.render(
-    <BrowserRouter>
-      <>
-        <Route exact path="/" component={App} />
-        <Route path="/add" component={AuthorWrapper} />
-      </>
-    </BrowserRouter>, document.getElementById('root'));
-};
-render();
+
+ReactDOM.render(
+  <BrowserRouter>
+    <>
+      <Route exact path="/" component={App} />
+      <Route path="/add" component={AuthorWrapper} />
+    </>
+  </BrowserRouter>, document.getElementById('root'));
+
+
 registerServiceWorker();
