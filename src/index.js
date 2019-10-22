@@ -63,42 +63,30 @@ const getTurnData = (authors) => {
   };
 };
 
-const reducer = (state = {authors, turnData: getTurnData(authors), highlight: ''},action) => {
+const reducer = (state = { authors, turnData: getTurnData(authors), highlight: '' }, action) => {
   switch (action.type) {
     case 'ANSWER_SELECTED':
       // eslint-disable-next-line no-case-declarations
       const isCorrect = state.turnData.author.books.some(book => book === action.answer);
-      return Object.assign({}, state, {highlight: isCorrect ? 'correct' : 'wrong'});
+      return Object.assign({}, state, { highlight: isCorrect ? 'correct' : 'wrong' });
     case 'CONTINUE':
-      return Object.assign({}, state, {highlight: '', turnData : getTurnData(state.authors)});
+      return Object.assign({}, state, { highlight: '', turnData: getTurnData(state.authors) });
+    case 'ADD_AUTHOR':
+      return Object.assign({}, state, { authors: state.authors.concat([action.author]) });
     default: return state;
   }
 };
 
-const store = Redux.createStore(reducer);
-
-const App = () => {
-  return <ReactRedux.Provider store={store}>
-    <AuthorQuiz />
-  </ReactRedux.Provider>;
-};
-
-// this is now a variable returing output of withRouter function
-const AuthorWrapper = withRouter(({ history }) =>
-  <AddAuthorForm onAddAuthor={(author) => {
-    authors.push(author);
-    history.push('/');
-  }} />);
-
-
+const store = Redux.createStore(reducer,window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 ReactDOM.render(
   <BrowserRouter>
-    <>
-      <Route exact path="/" component={App} />
-      <Route path="/add" component={AuthorWrapper} />
-    </>
+    <ReactRedux.Provider store={store}>
+      <>
+        <Route exact path="/" component={AuthorQuiz} />
+        <Route path="/add" component={AddAuthorForm} />
+      </>
+    </ReactRedux.Provider>
   </BrowserRouter>, document.getElementById('root'));
-
 
 registerServiceWorker();

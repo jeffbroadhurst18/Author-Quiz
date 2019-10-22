@@ -1,5 +1,7 @@
 /* eslint-disable linebreak-style */
 import React from 'react';
+import {connect} from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import './AddAuthorForm.css';
 
 class AuthorForm extends React.Component {
@@ -22,7 +24,7 @@ class AuthorForm extends React.Component {
     this.props.onAddAuthor(this.state);
   }
 
-  onFieldChange(event){
+  onFieldChange(event) {
     this.setState({
       [event.target.name]: event.target.value,
     });
@@ -44,12 +46,12 @@ class AuthorForm extends React.Component {
         </div>
         <div className="AddAuthorForm__input">
           <label htmlFor="imageUrl">Image Url</label>
-          <input type="text" name="imageUrl" value={this.state.imageUrl} onChange={this.onFieldChange}/>
+          <input type="text" name="imageUrl" value={this.state.imageUrl} onChange={this.onFieldChange} />
         </div>
         <div className="AddAuthorForm__input">
-          {this.state.books.map((book,i) => <p key={i}>{book}</p>)}
+          {this.state.books.map((book, i) => <p key={i}>{book}</p>)}
           <label htmlFor="bookTemp">Books</label>
-          <input type="text" name="bookTemp" value={this.state.bookTemp} onChange={this.onFieldChange}/>
+          <input type="text" name="bookTemp" value={this.state.bookTemp} onChange={this.onFieldChange} />
           <input type="button" value="+" onClick={this.handleAddBook} />
         </div>
         <input type="submit" value="Add" />
@@ -57,11 +59,24 @@ class AuthorForm extends React.Component {
   }
 }
 
-const AddAuthorForm=({match, onAddAuthor}) => {
+const AddAuthorForm = ({ match, onAddAuthor }) => {
   return (<div className="AddAuthorForm">
     <h1>Add Author</h1>
-    <AuthorForm onAddAuthor={onAddAuthor}/>
+    <AuthorForm onAddAuthor={onAddAuthor} />
   </div>);
-}; 
+};
 
-export default AddAuthorForm;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onAddAuthor: (author) => {
+      dispatch({ type: 'ADD_AUTHOR', author });
+      props.history.push('/');
+    },
+  };
+};
+
+export default withRouter(connect(() => { }, mapDispatchToProps)(AddAuthorForm));
+
+// Doesn't use state so deosn't need mapStateToProps
+// Does produce event so need mapDispatchToProps
+// withRouter ensures there is a history prop
